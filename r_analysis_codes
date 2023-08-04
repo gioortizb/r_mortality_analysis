@@ -1,1 +1,234 @@
+> lm(mortality~race+sex+year+race:sex+race:year+race:sex:year)->ancovamodel
+> ancovamodel
+
+Call:
+lm(formula = mortality ~ race + sex + year + race:sex + race:year + 
+    race:sex:year)
+
+Coefficients:
+           (Intercept)               raceWhite                 sexMale  
+             48086.306              -14767.096               -6173.656  
+                  year       raceWhite:sexMale          raceWhite:year  
+               -23.703                4087.893                   7.330  
+raceBlack:sexMale:year  raceWhite:sexMale:year  
+                 3.370                   1.259  
+> anova(ancovamodel)
+Analysis of Variance Table
+
+Response: mortality
+               Df    		Sum Sq   	Mean Sq   	F value    	Pr(>F)    
+race            1  		22697659  	22697659  	677.9871 	< 2.2e-16 ***
+sex             1  		18145164  	18145164  	542.0025 	< 2.2e-16 ***
+year            1 		176025898 	176025898 	5257.9559 	< 2.2e-16 ***
+race:sex      1 		51029     	51029    	1.5242    	0.2176    
+race:year    1   		4860942   	4860942  	145.1981 	< 2.2e-16 ***
+race:sex:year   2    	798964    	399482   	11.9327 	8.934e-06 ***
+Residuals     448  	14998148     	33478                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+> residuals(ancovamodel)->ancovaresids
+> shapiro.test(ancovaresids)
+
+	Shapiro-Wilk normality test
+
+data:  ancovaresids
+W = 0.98907, p-value = 0.001761
+> bptest(ancovamodel)
+
+	studentized Breusch-Pagan test
+
+data:  ancovamodel
+BP = 92.897, df = 7, p-value < 2.2e-16
+
+
+
+
+
+
+> lm(mortality~race+sex+year+race:year+race:sex:year)->ancovamodel2
+> ancovamodel2
+
+Call:
+lm(formula = mortality ~ race + sex + year + race:year + race:sex:year)
+
+Coefficients:
+           (Intercept)               raceWhite                 sexMale  
+             47064.333              -12723.149               -4129.710  
+                  year          raceWhite:year  raceBlack:sexMale:year  
+               -23.181                   6.286                   2.326  
+raceWhite:sexMale:year  
+                 2.304  
+
+> anova(ancovamodel2)
+Analysis of Variance Table
+
+Response: mortality
+               Df    Sum Sq   Mean Sq  F value    Pr(>F)    
+race            1  22697659  22697659  673.452 < 2.2e-16 ***
+sex             1  18145164  18145164  538.377 < 2.2e-16 ***
+year            1 176025898 176025898 5222.787 < 2.2e-16 ***
+race:year       1   4860942   4860942  144.227 < 2.2e-16 ***
+race:sex:year   2    715296    357648   10.612 3.141e-05 ***
+Residuals     449  15132845     33703                       
+---
+
+> residuals(ancovamodel2)->ancova2resids
+> shapiro.test(ancova2resids)
+
+	Shapiro-Wilk normality test
+
+data:  ancova2resids
+W = 0.98958, p-value = 0.00253
+
+> bptest(ancovamodel2)
+
+	studentized Breusch-Pagan test
+
+data:  ancovamodel2
+BP = 90.274, df = 6, p-value < 2.2e-16
+> log(lm(Mortality$Mortality~Race+Sex+Year+Race:Sex+Race:Year+Race:Sex:Year))->ancovamodel2
+Error in log(lm(Mortality$Mortality ~ Race + Sex + Year + Race:Sex + Race:Year +  : 
+  non-numeric argument to mathematical function
+> log(lm(Mortality$Mortality~Race+Sex+Year+Race:Sex+Race:Year+Race:Sex:Year))
+Error in log(lm(Mortality$Mortality ~ Race + Sex + Year + Race:Sex + Race:Year +  : 
+  non-numeric argument to mathematical function
+> loglm(Mortality$Mortality~Race+Sex+Year+Race:Sex+Race:Year+Race:Sex:Year)->logmodel
+> shapiro.test(logmodel)
+Error: is.numeric(x) is not TRUE
+> residuals(logmodel)->residslog
+Re-fitting to get frequencies and fitted values
+> shapiro.test(residslog)
+
+	Shapiro-Wilk normality test
+
+data:  residslog
+W = 0.2639, p-value < 2.2e-16
+
+> bptest(logmodel)
+
+	studentized Breusch-Pagan test
+
+data:  logmodel
+BP = 92.897, df = 7, p-value < 2.2e-16
+> set.seed(1234)
+> boot.anova(formula ="mortality~Race*Year*Sex",data=Mortality,reps=1500,dec=2)
+BCa Bootstrap Anova Table (Type III tests)
+
+Response: mortality
+              Sum Sq      Df  F value SE     LB      UB      Crit F z    Pr(>|z|)    
+(Intercept)   74552150.21 1   2226.90 297.18 1648.21 2836.13 3.86   7.49 6.71e-14 ***
+Race          3515422.48  1   105.01  24.55  63.00   160.73  3.86   4.28 1.89e-05 ***
+Year          69358684.97 1   2071.77 274.80 1531.17 2622.76 3.86   7.54 4.73e-14 ***
+Sex           614429.79   1   18.35   11.01  2.64    42.88   3.86   1.67 0.0957   .  
+Race:Year     3316899.32  1   99.08   23.68  58.27   152.69  3.86   4.18 2.87e-05 ***
+Race:Sex      134696.56   1   4.02    4.22   0.03    15.02   3.86   0.95 0.34        
+Year:Sex      701096.95   1   20.94   11.71  3.65    46.93   3.86   1.79 0.0738   .  
+Race:Year:Sex 137538.39   1   4.11    4.24   0.04    15.04   3.86   0.97 0.333       
+Residuals     14998148.34 448                                                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1)
+
+
+> boot.anova(formula ="mortality~Race+Year+Sex+Race:Year+Race:Sex+Year:Sex+Race:Year:Sex",data=Mortality,reps=1500,dec=2)
+BCa Bootstrap Anova Table (Type III tests)
+
+Response: mortality
+              Sum Sq      Df  F value SE     LB      UB      Crit F z    Pr(>|z|)    
+(Intercept)   74552150.21 1   2226.90 288.93 1697.94 2828.52 3.86   7.71 1.28e-14 ***
+Race          3515422.48  1   105.01  25.08  61.39   159.58  3.86   4.19 2.83e-05 ***
+Year          69358684.97 1   2071.77 267.14 1581.15 2618.13 3.86   7.76 8.81e-15 ***
+Sex           614429.79   1   18.35   11.24  3.25    46.23   3.86   1.63 0.103       
+Race:Year     3316899.32  1   99.08   24.21  57.04   152.00  3.86   4.09 4.26e-05 ***
+Race:Sex      134696.56   1   4.02    4.34   0.06    16.07   3.86   0.93 0.354       
+Year:Sex      701096.95   1   20.94   11.97  4.50    50.50   3.86   1.75 0.0802   .  
+Race:Year:Sex 137538.39   1   4.11    4.38   0.06    16.28   3.86   0.94 0.348       
+Residuals     14998148.34 448                                                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1)
+
+
+> boot.anova(formula ="mortality~Race+Year+Sex+Race:Year+Race:Sex+Year:Sex",data=Mortality,reps=1500,dec=2)
+BCa Bootstrap Anova Table (Type III tests)
+
+Response: mortality
+            Sum Sq      Df  F value SE     LB      UB      Crit F z    Pr(>|z|)    
+(Intercept) 95170794.68 1   2823.24 312.35 2228.78 3427.89 3.86   9.04 1.59e-19 ***
+Race        5200417.34  1   154.27  26.24  107.90  211.03  3.86   5.88 4.12e-09 ***
+Year        88405952.53 1   2622.56 287.93 2079.28 3183.71 3.86   9.11 8.37e-20 ***
+Sex         544091.9    1   16.14   8.63   3.74    35.40   3.86   1.87 0.0614   .  
+Race:Year   4860942.32  1   144.20  25.19  99.86   199.21  3.86   5.72 1.04e-08 ***
+Race:Sex    51028.61    1   1.51    2.96   0.00    11.29   3.86   0.51 0.609       
+Year:Sex    661425.98   1   19.62   9.46   5.64    40.38   3.86   2.07 0.0381   *  
+Residuals   15135686.73 449                                                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1)
+
+
+> boot.anova(formula ="mortality~Race+Year+Sex+Race:Year+Year:Sex",data=Mortality,reps=1500,dec=2)
+BCa Bootstrap Anova Table (Type III tests)
+
+Response: mortality
+            Sum Sq      Df  F value SE     LB      UB      Crit F z    Pr(>|z|)    
+(Intercept) 95222567.77 1   2821.56 312.75 2257.44 3500.51 3.86   9.02 1.85e-19 ***
+Race        5219231.57  1   154.65  25.68  106.44  209.17  3.86   6.02 1.71e-09 ***
+Year        88405952.53 1   2619.57 288.68 2087.01 3233.64 3.86   9.07 1.15e-19 ***
+Sex         549865.41   1   16.29   8.52   4.22    38.25   3.86   1.91 0.0558   .  
+Race:Year   4860942.32  1   144.04  24.50  98.41   196.20  3.86   5.88 4.11e-09 ***
+Year:Sex    661425.98   1   19.60   9.31   5.96    43.11   3.86   2.10 0.0354   *  
+Residuals   15186715.35 450                                                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1)
+
+10,000 Sample Boot Strap Test
+
+> boot.anova(formula ="mortality~Race+Year+Sex+Race:Year+Race:Sex+Year:Sex+Race:Year:Sex",data=Mortality,reps=10000,dec=2)
+BCa Bootstrap Anova Table (Type III tests)
+
+Response: mortality
+              Sum Sq      Df  F value 	SE   	  LB      UB      Crit F z    Pr(>|z|)    
+(Intercept)   74552150.21 1   2226.90 301.58 1673.78 2858.18 3.86   7.38 1.53e-13 ***
+Race          3515422.48  1   105.01  	24.88 	 61.70   159.85  3.86   4.22 2.43e-05 ***
+Year          69358684.97 1   2071.77	 278.74 1561.57 2656.50 3.86   7.43 1.06e-13 ***
+Sex           614429.79   1   18.35  	 11.33  3.14    45.89   3.86   1.62 0.105       
+Race:Year     3316899.32  1   99.08   	24.00  57.29   152.02  3.86   4.13 3.67e-05 ***
+Race:Sex      134696.56   1   4.02   	 4.45   0.04    16.36   3.86   0.90 0.366       
+Year:Sex      701096.95   1   20.94  	 12.05  4.27    49.79   3.86   1.74 0.0822   .  
+Race:Year:Sex 137538.39   1   4.11    4.48   0.04    16.51   3.86   0.92 0.359       
+Residuals     14998148.34 448                                                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1)
+
+> boot.anova(formula ="mortality~Race+Year+Sex+Race:Year+Race:Sex+Year:Sex",data=Mortality,reps=10000,dec=2)
+BCa Bootstrap Anova Table (Type III tests)
+
+Response: mortality
+            Sum Sq      Df  F value SE     LB      UB      Crit F z    Pr(>|z|)    
+(Intercept) 95170794.68 1   2823.24 308.68 2267.03 3471.26 3.86   9.15 5.9e-20  ***
+Race        5200417.34  1   154.27  25.99  107.83  210.58  3.86   5.94 2.93e-09 ***
+Year        88405952.53 1   2622.56 284.56 2107.63 3221.25 3.86   9.22 3.08e-20 ***
+Sex         544091.9    1   16.14   8.43   3.78    35.72   3.86   1.92 0.0554   .  
+Race:Year   4860942.32  1   144.20  24.92  99.59   198.30  3.86   5.79 7.21e-09 ***
+Race:Sex    51028.61    1   1.51    3.00   0.00    10.40   3.86   0.50 0.614       
+Year:Sex    661425.98   1   19.62   9.23   5.63    40.68   3.86   2.13 0.0334   *  
+Residuals   15135686.73 449                                                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1)
+
+
+> boot.anova(formula ="mortality~Race+Year+Sex+Race:Year+Year:Sex",data=Mortality,reps=10000,dec=2)
+BCa Bootstrap Anova Table (Type III tests)
+
+Response: mortality
+            Sum Sq      Df  F value 	SE     	LB      UB      Crit F z    Pr(>|z|)    
+(Intercept) 95222567.77 1   2821.56 310.84 2272.74 3494.67 3.86   9.08 1.11e-19 ***
+Race        5219231.57  1   154.65  25.82  107.19  208.69  3.86   5.99 2.1e-09  ***
+Year        88405952.53 1   2619.57 287.12 2112.01 3239.36 3.86   9.12 7.27e-20 ***
+Sex         549865.41   1   16.29   	8.48   4.06    36.42   3.86   1.92 0.0548   .  
+Race:Year   4860942.32  1   144.04  24.62  98.72   195.52  3.86   5.85 4.88e-09 ***
+Year:Sex    661425.98   1   19.60   9.27   5.80    41.28   3.86   2.11 0.0345   *  
+Residuals   15186715.35 450                                                        
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1)
+
 
